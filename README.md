@@ -1,6 +1,8 @@
-# Assessment1
+# Assessment
 
 # IBM员工流失预测 - 优化堆叠模型
+
+Dataset: https://www.kaggle.com/datasets/pavansubhasht/ibm-hr-analytics-attrition-dataset
 
 ## 项目概述
 
