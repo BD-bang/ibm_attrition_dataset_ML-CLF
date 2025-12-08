@@ -60,17 +60,9 @@
 
 ### 运行主模型
 
-```python 
-# 运行优化后的堆叠模型
-jupyter notebook HR_Employee_Attrition_Optimized_Stacking.ipynb
-```
-
-
-### 对比分析
-
-```python 
-# 查看原始模型与优化模型的对比
-jupyter notebook HR_Employee_Attrition_Comparison_Analysis.ipynb
+```python
+# 直接运行Python脚本
+python train.py
 ```
 
 
@@ -78,7 +70,7 @@ jupyter notebook HR_Employee_Attrition_Comparison_Analysis.ipynb
 
 ```python
 # 直接运行Python脚本
-python optimized_script_balanced.py
+python predict.py
 ```
 
 
