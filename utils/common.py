@@ -38,18 +38,11 @@ def prepare_features(df):
     # 标签列
     Y = df['Attrition']
 
-    # 使用LabelEncoder转换标签数据
-    le = LabelEncoder()
-    Y = le.fit_transform(Y)
-    Y = pd.DataFrame(Y, columns=['Attrition'])
+    # 使用get_dummies处理标签列
+    Y = pd.get_dummies(Y, columns=['Attrition'], drop_first=True)
 
     # 特征列
     X = df.drop(columns=df.columns[0])
-
-    # 转换特征数据
-    for col in X.columns:
-        if X[col].dtype == object:
-            X[col] = le.fit_transform(X[col])
 
     # 选取的特征
     choose_feature = ['Age', 'DistanceFromHome','OverTime','Department',
@@ -58,10 +51,6 @@ def prepare_features(df):
 
     # 与选取的特征取交集
     X = X[X.columns.intersection(choose_feature).tolist()]
-
-    # 使用ADASYN进行样本均衡
-    adasyn = ADASYN(random_state=42)
-    X, Y = adasyn.fit_resample(X, Y)
 
     # 保存处理后的数据到data/processed文件夹
     os.makedirs('../data/processed', exist_ok=True)
@@ -110,10 +99,6 @@ def split_data(X, Y, test_size=0.2, random_state=42):
     """
     划分训练集和测试集
     """
-    # 使用SMOTE进行样本均衡
-    smote = SMOTE(random_state=42)
-    X, Y = smote.fit_resample(X, Y)
-
     # 划分数据集
     X_train, X_test, y_train, y_test = train_test_split(
         X, Y, test_size=test_size, random_state=random_state, shuffle=True, stratify=Y)

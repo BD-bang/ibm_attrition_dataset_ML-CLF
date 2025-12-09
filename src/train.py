@@ -7,8 +7,8 @@ from utils.common import (
     load_and_preprocess_data, prepare_features, create_preprocessor,
     split_data, evaluate_model, plot_roc_curve, save_model
 )
-
-from sklearn.pipeline import Pipeline
+from imblearn.over_sampling import RandomOverSampler,SMOTE
+from imblearn.pipeline import Pipeline as ImbPipeline
 from sklearn.model_selection import GridSearchCV, StratifiedKFold
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
@@ -32,8 +32,9 @@ def train_knn_model(X_train, y_train, preprocessor):
     }
 
     # 创建管道
-    knn = Pipeline([
+    knn = ImbPipeline([
         ('prep', preprocessor),
+        ('smote', SMOTE(k_neighbors=5, random_state=42)),
         ('clf', KNeighborsClassifier())
     ])
 
@@ -63,8 +64,9 @@ def train_lr_model(X_train, y_train, preprocessor):
     }
 
     # 创建管道
-    lr = Pipeline([
+    lr = ImbPipeline([
         ('prep', preprocessor),
+        ('smote', SMOTE(k_neighbors=5, random_state=42)),
         ('clf', LogisticRegression())
     ])
 
@@ -94,8 +96,9 @@ def train_dt_model(X_train, y_train, preprocessor):
     }
 
     # 创建管道
-    dt = Pipeline([
-        ('preprocess', preprocessor),
+    dt = ImbPipeline([
+        ('prep', preprocessor),
+        ('smote', SMOTE(k_neighbors=5, random_state=42)),
         ('dt', DecisionTreeClassifier())
     ])
 
@@ -126,8 +129,9 @@ def train_rf_model(X_train, y_train, preprocessor):
     }
 
     # 创建管道
-    rf = Pipeline([
-        ('preprocess', preprocessor),
+    rf = ImbPipeline([
+        ('prep', preprocessor),
+        ('smote', SMOTE(k_neighbors=5, random_state=42)),
         ('clf', RandomForestClassifier(random_state=42))
     ])
 
@@ -155,8 +159,9 @@ def train_ada_model(X_train, y_train, preprocessor):
     }
 
     # 创建管道
-    ada = Pipeline([
-        ('preprocess', preprocessor),
+    ada = ImbPipeline([
+        ('prep', preprocessor),
+        ('smote', SMOTE(k_neighbors=5, random_state=42)),
         ('clf', AdaBoostClassifier(random_state=42))
     ])
 
@@ -187,8 +192,9 @@ def train_gbdt_model(X_train, y_train, preprocessor):
     }
 
     # 创建管道
-    gbdt = Pipeline([
-        ('preprocessor', preprocessor),
+    gbdt = ImbPipeline([
+        ('prep', preprocessor),
+        ('smote', SMOTE(k_neighbors=5, random_state=42)),
         ('clf', GradientBoostingClassifier(random_state=42))
     ])
 
@@ -219,8 +225,9 @@ def train_xgb_model(X_train, y_train, preprocessor):
     }
 
     # 创建管道
-    xgb_model = Pipeline([
-        ('preprocessor', preprocessor),
+    xgb_model = ImbPipeline([
+        ('prep', preprocessor),
+        ('smote', SMOTE(k_neighbors=5, random_state=42)),
         ('clf', xgb.XGBClassifier())
     ])
 
@@ -249,8 +256,9 @@ def train_stacking_model(X_train, y_train, base_learners, preprocessor):
     }
 
     # 创建元学习器
-    meta_learner = Pipeline([
-        ('preprocess', preprocessor),
+    meta_learner = ImbPipeline([
+        ('prep', preprocessor),
+        ('smote', SMOTE(k_neighbors=5, random_state=42)),
         ('metal', LogisticRegression())
     ])
 
