@@ -435,43 +435,43 @@ if __name__ == '__main__':
     # # 1. 测试: 数据加载和预处理
     # print("1. 测试: 数据加载和预处理...")
     # df = load_and_preprocess_data('../data/train.csv')
-    # print(f"    数据加载完成，形状: {df.shape}")
+    # print(f"数据加载完成，形状: {df.shape}")
 
     # # 2. 测试: 特征工程
     # print("\n2. 测试: 特征工程...")
     # X, Y = prepare_features(df)
-    # print(f"    特征工程完成，X形状: {X.shape}, Y形状: {Y.shape}")
+    # print(f"特征工程完成，X形状: {X.shape}, Y形状: {Y.shape}")
 
     # # 3. 测试: 创建预处理器
     # print("\n3. 测试: 创建预处理器...")
     # preprocessor = create_preprocessor(X)
-    # print("    预处理器创建完成")
+    # print("预处理器创建完成")
 
     # # 4. 测试: 数据划分
     # print("\n4. 测试: 数据划分...")
     # X_train, X_test, y_train, y_test = split_data(X, Y)
-    # print(f"    数据划分完成 - 训练集: {len(X_train)}, 测试集: {len(X_test)}")
+    # print(f"数据划分完成 - 训练集: {len(X_train)}, 测试集: {len(X_test)}")
 
     # # 5. 测试: 模型训练（简化版，只训练一个模型）
     # print("\n5. 测试: 模型训练...")
-    # print("   训练kNN模型...")
+    # print("训练kNN模型...")
     # best_knn = train_knn_model(X_train, y_train, preprocessor)
-    # print("    kNN模型训练完成")
+    # print("kNN模型训练完成")
 
     # # 6. 测试: 模型评估
     # print("\n6. 测试: 模型评估...")
     # acc, f1, auc_score = evaluate_model(best_knn, X_test, y_test)
-    # print(f"   模型评估完成 - 准确率: {acc:.4f}, F1: {f1:.4f}, AUC: {auc_score:.4f}")
+    # print(f"模型评估完成 - 准确率: {acc:.4f}, F1: {f1:.4f}, AUC: {auc_score:.4f}")
 
     # # 7. 测试: 模型保存
     # print("\n7. 测试: 模型保存...")
     # save_model(best_knn, "test_knn")
-    # print("   模型保存完成")
+    # print("模型保存完成")
 
     # # 8. 测试: ROC曲线绘制
     # print("\n8. 测试: ROC曲线绘制...")
     # plot_roc_curve(best_knn, X_test, y_test, "Test KNN", save_dir='../data/results')
-    # print("   ROC曲线绘制完成")
+    # print("ROC曲线绘制完成")
 
     # print("\n" + "="*60)
     # print("所有测试完成！")

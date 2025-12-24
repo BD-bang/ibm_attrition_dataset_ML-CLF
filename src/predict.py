@@ -295,16 +295,16 @@ if __name__ == '__main__':
     # print("1. 测试: 日志记录器初始化...")
     # logger = Logger('../', 'test_predictions').get_logger()
     # logger.info("开始预测测试...")
-    # print("  日志记录器初始化完成")
+    # print("日志记录器初始化完成")
 
     # # 2. 测试: 测试数据加载
     # print("\n2. 测试: 测试数据加载...")
     # try:
     #     X_test, y_test = load_test_data('../data/test2.csv')
-    #     print(f"   测试数据加载完成 - 样本数: {len(X_test)}")
+    #     print(f"测试数据加载完成 - 样本数: {len(X_test)}")
     #     logger.info(f"测试数据加载完成 - 样本数: {len(X_test)}")
     # except Exception as e:
-    #     print(f"   测试数据加载失败: {str(e)}")
+    #     print(f"测试数据加载失败: {str(e)}")
     #     logger.error(f"测试数据加载失败: {str(e)}")
 
     # # 3. 测试: 模型加载
@@ -315,13 +315,13 @@ if __name__ == '__main__':
     #     if model_files:
     #         test_model_name = model_files[0].replace('.pkl', '')
     #         model = load_model(test_model_name)
-    #         print(f"   模型 {test_model_name} 加载成功")
+    #         print(f"模型 {test_model_name} 加载成功")
     #         logger.info(f"模型 {test_model_name} 加载成功")
     #     else:
-    #         print("   未找到模型文件，跳过模型加载测试")
+    #         print("未找到模型文件，跳过模型加载测试")
     #         logger.warning("未找到模型文件，跳过模型加载测试")
     # except Exception as e:
-    #     print(f"    模型加载失败: {str(e)}")
+    #     print(f"模型加载失败: {str(e)}")
     #     logger.error(f"模型加载失败: {str(e)}")
 
     # # 4. 测试: 模型预测和评估
@@ -329,13 +329,13 @@ if __name__ == '__main__':
     # try:
     #     if 'model' in locals() and 'X_test' in locals() and 'y_test' in locals():
     #         accuracy, f1, auc_score = predict_and_evaluate(model, X_test, y_test, "Test Model")
-    #         print(f"    模型评估完成 - 准确率: {accuracy:.4f}, F1: {f1:.4f}, AUC: {auc_score:.4f}")
+    #         print(f"模型评估完成 - 准确率: {accuracy:.4f}, F1: {f1:.4f}, AUC: {auc_score:.4f}")
     #         logger.info(f"模型评估结果 - 准确率: {accuracy:.4f}, F1: {f1:.4f}, AUC: {auc_score:.4f}")
     #     else:
-    #         print("    缺少必要数据，跳过预测评估测试")
+    #         print("缺少必要数据，跳过预测评估测试")
     #         logger.warning("缺少必要数据，跳过预测评估测试")
     # except Exception as e:
-    #     print(f"    模型预测评估失败: {str(e)}")
+    #     print(f"模型预测评估失败: {str(e)}")
     #     logger.error(f"模型预测评估失败: {str(e)}")
 
     # # 5. 测试: ROC曲线绘制
@@ -343,13 +343,13 @@ if __name__ == '__main__':
     # try:
     #     if 'model' in locals() and 'X_test' in locals() and 'y_test' in locals():
     #         plot_roc_curve(model, X_test, y_test, "Test Model", save_dir='../data/results')
-    #         print("    ROC曲线绘制完成")
+    #         print("ROC曲线绘制完成")
     #         logger.info("ROC曲线绘制完成")
     #     else:
-    #         print("    缺少必要数据，跳过ROC曲线绘制测试")
+    #         print("缺少必要数据，跳过ROC曲线绘制测试")
     #         logger.warning("缺少必要数据，跳过ROC曲线绘制测试")
     # except Exception as e:
-    #     print(f"    ROC曲线绘制失败: {str(e)}")
+    #     print(f"ROC曲线绘制失败: {str(e)}")
     #     logger.error(f"ROC曲线绘制失败: {str(e)}")
 
     # # 6. 测试: 逐行预测功能

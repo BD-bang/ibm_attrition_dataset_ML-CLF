@@ -3,11 +3,16 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 from joblib import dump
-from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder, StandardScaler, LabelEncoder
+from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder, StandardScaler
 from sklearn.compose import ColumnTransformer
 from sklearn.model_selection import train_test_split
 from imblearn.over_sampling import SMOTE, ADASYN
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, f1_score, roc_curve, auc
+from sklearn.feature_selection import RFE
+from sklearn.svm import SVC
+import re
+from imblearn.pipeline import Pipeline as ImbPipeline
+
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -19,9 +24,6 @@ def load_and_preprocess_data(data_path='../data/train.csv'):
     # 加载训练数据
     train_data = pd.read_csv(data_path)
     df = pd.DataFrame(train_data)
-
-    # 去除冗余特征
-    df.drop(columns=['Over18', 'StandardHours', 'EmployeeNumber'], inplace=True)
 
     # 保存原始数据集到data/processed文件夹
     os.makedirs('../data/processed', exist_ok=True)
@@ -42,12 +44,49 @@ def prepare_features(df):
     Y = pd.get_dummies(Y, columns=['Attrition'], drop_first=True)
 
     # 特征列
-    X = df.drop(columns=df.columns[0])
+    X = df.drop(columns='Attrition')
 
-    # 选取的特征
-    choose_feature = ['Age', 'DistanceFromHome','OverTime','Department',
-                                'MonthlyIncome', 'NumCompaniesWorked', 'EnvironmentSatisfaction',
-                                'StockOptionLevel', 'TotalWorkingYears']
+    # 选取特征
+    # 1. 先按「数据类型」拆
+    num_cols = X.select_dtypes(include='number').columns   # 所有数值列
+    str_cols = X.select_dtypes(include='object').columns   # 所有 object 字符串列
+
+    # 2. 再按「取值个数」拆数值列
+    continuous_cols = [c for c in num_cols if X[c].nunique() > 6]
+    ordinal_cols    = [c for c in num_cols if X[c].nunique() <= 6]
+
+    # 3. 字符串列直接当 nominal
+    nominal_cols = list(str_cols)
+
+    preprocessor = ColumnTransformer(
+        transformers=[
+            ('nom', OneHotEncoder(handle_unknown='ignore', sparse_output=False), nominal_cols),
+            ('ord', OrdinalEncoder(), ordinal_cols),
+            ('cont', StandardScaler(), continuous_cols)
+        ],
+    ).set_output(transform="pandas")
+
+    rfe = ImbPipeline([
+        ('prep', preprocessor),
+        ('smote', SMOTE(k_neighbors=5, random_state=42)),
+        ('rfe',  RFE(SVC(kernel='linear', C=1), n_features_to_select=30, step=0.2))])
+
+
+    X_rfe = rfe.fit(X, Y)
+    feat_names = X_rfe.named_steps['prep'].get_feature_names_out()
+    selected   = feat_names[X_rfe.named_steps['rfe'].support_]
+
+    rev_map = {}
+
+    for orig_col in X.columns:
+        pattern = re.compile(r'^(?:\w+__)?' + re.escape(orig_col) + r'(?:_.*)?$')
+        for eng_col in selected:
+            if pattern.match(eng_col):
+                rev_map[eng_col] = orig_col
+
+    # 去重
+    original_selected = list(dict.fromkeys(rev_map.values()))
+    choose_feature = original_selected
 
     # 与选取的特征取交集
     X = X[X.columns.intersection(choose_feature).tolist()]
@@ -64,18 +103,17 @@ def create_preprocessor(X):
     """
     创建数据预处理器
     """
-    # 无序字符型
-    nominal_cols = ['BusinessTravel', 'Department', 'EducationField', 'Gender', 'JobRole', 'MaritalStatus', 'OverTime']
-
-    # 有序字符型
-    ordinal_cols = ['Education', 'EnvironmentSatisfaction', 'JobInvolvement', 'JobLevel',
-                   'JobSatisfaction', 'PerformanceRating', 'RelationshipSatisfaction',
-                   'StockOptionLevel', 'WorkLifeBalance']
+    # 1. 先按「数据类型」拆
+    num_cols = X.select_dtypes(include='number').columns   # 所有数值列
+    str_cols = X.select_dtypes(include='object').columns   # 所有 object 字符串列
 
     # 数字连续型
-    continuous_cols = ['Age', 'DistanceFromHome', 'MonthlyIncome', 'NumCompaniesWorked',
-                      'PercentSalaryHike', 'TotalWorkingYears', 'TrainingTimesLastYear',
-                      'YearsAtCompany', 'YearsInCurrentRole', 'YearsSinceLastPromotion', 'YearsWithCurrManager']
+    continuous_cols = [c for c in num_cols if X[c].nunique() > 6]
+    # 有序字符型
+    ordinal_cols    = [c for c in num_cols if X[c].nunique() <= 6]
+
+     # 无序字符型
+    nominal_cols = list(str_cols)
 
     # 获取实际存在的特征
     choose_feature = X.columns.tolist()
@@ -185,22 +223,22 @@ if __name__ == '__main__':
     # 1. 测试: 数据加载和预处理
     print("1. 测试: 数据加载和预处理...")
     df = load_and_preprocess_data('../data/train.csv')
-    print(f"   数据加载完成，形状: {df.shape}")
+    print(f"数据加载完成，形状: {df.shape}")
 
     # 2. 测试: 特征工程
     print("\n2. 测试: 特征工程...")
     X, Y = prepare_features(df)
-    print(f"   特征工程完成，X形状: {X.shape}, Y形状: {Y.shape}")
+    print(f"特征工程完成，X形状: {X.shape}, Y形状: {Y.shape}")
 
     # 3. 测试: 创建预处理器
     print("\n3. 测试: 创建预处理器...")
     preprocessor = create_preprocessor(X)
-    print("   预处理器创建完成")
+    print("预处理器创建完成")
 
     # 4. 测试: 数据划分
     print("\n4. 测试: 数据划分...")
     X_train, X_test, y_train, y_test = split_data(X, Y)
-    print(f"   数据划分完成 - 训练集: {len(X_train)}, 测试集: {len(X_test)}")
+    print(f"数据划分完成 - 训练集: {len(X_train)}, 测试集: {len(X_test)}")
 
     # 5. 测试: 模型评估功能
     print("\n5. 测试: 模型评估功能...")
@@ -209,17 +247,17 @@ if __name__ == '__main__':
     dummy_model = DummyClassifier(strategy='most_frequent')
     dummy_model.fit(X_train, y_train)
     acc, f1, auc_score = evaluate_model(dummy_model, X_test, y_test)
-    print(f"   模型评估完成 - 准确率: {acc:.4f}, F1: {f1:.4f}, AUC: {auc_score:.4f}")
+    print(f"模型评估完成 - 准确率: {acc:.4f}, F1: {f1:.4f}, AUC: {auc_score:.4f}")
 
     # 6. 测试: ROC曲线绘制
     print("\n6. 测试: ROC曲线绘制...")
     plot_roc_curve(dummy_model, X_test, y_test, "Test Dummy Model", save_dir='../data/results')
-    print("   ROC曲线绘制完成")
+    print("ROC曲线绘制完成")
 
     # 7. 测试: 模型保存
     print("\n7. 测试: 模型保存...")
     save_model(dummy_model, "test_dummy_model")
-    print("   模型保存完成")
+    print("模型保存完成")
 
     print("\n" + "="*60)
     print("common.py 所有测试完成！")
